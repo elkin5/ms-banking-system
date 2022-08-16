@@ -2,8 +2,8 @@ package co.elkin.veritran.usecase.account;
 
 import co.elkin.veritran.model.account.Account;
 import co.elkin.veritran.model.accountregister.AccountRegister;
-import co.elkin.veritran.model.client.Client;
 import co.elkin.veritran.model.transaction.Transaction;
+import co.elkin.veritran.model.transaction.exceptions.TransactionException;
 import co.elkin.veritran.model.transactiontype.TransactionType;
 import co.elkin.veritran.usecase.accountregister.ValidateRegisterUseCase;
 import co.elkin.veritran.usecase.transaction.SaveTransactionUseCase;
@@ -20,7 +20,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 class DepositMoneyUseCaseTest {
     @Mock
@@ -45,14 +44,6 @@ class DepositMoneyUseCaseTest {
     @Test
     @DisplayName("When he deposits 10 USD into his account Then the balance of his account is 110 USD")
     void testDepositMoney() {
-        Client client = Client.builder()
-                .id(1L)
-                .name("francisco")
-                .email("francisco@example.com")
-                .birthDate(LocalDate.of(2000, 1, 1))
-                .lastName("Rodriguez")
-                .documentNumber("123456")
-                .build();
         Account account = Account.builder()
                 .id(2L)
                 .number(1234567855555558L)
@@ -87,8 +78,8 @@ class DepositMoneyUseCaseTest {
                 .thenReturn(Mono.just(account));
         Mockito.when(validateRegisterUseCase.validateById(2L))
                 .thenReturn(Mono.just(accountRegister));
-        Mockito.when(findTransactionTypeUseCase.findByName("withdrawal"))
-                .thenReturn(Mono.just(TransactionType.builder().id(1L).name("withdrawal").build()));
+        Mockito.when(findTransactionTypeUseCase.findByName("deposit"))
+                .thenReturn(Mono.just(TransactionType.builder().id(1L).name("deposit").build()));
         Mockito.when(saveTransactionUseCase.save(transaction.toBuilder().id(null).build()))
                 .thenReturn(Mono.just(transaction));
         Mockito.when(saveAccountUseCase.saveAccount(accountUpdated))
@@ -102,5 +93,13 @@ class DepositMoneyUseCaseTest {
                     return true;
                 })
                 .verifyComplete();
+    }
+
+    @Test
+    @DisplayName("when the amount is negative then Exception")
+    void testDepositMoney2() {
+        depositMoneyUseCase.deposit(1234567855555558L, BigDecimal.TEN)
+                .as(StepVerifier::create)
+                .verifyError(TransactionException.class);
     }
 }
