@@ -51,14 +51,6 @@ class GenerateTransactionUseCaseTest {
                 .debit(BigDecimal.ZERO)
                 .currency("USD")
                 .build();
-        Account accountUpdated = Account.builder()
-                .id(2L)
-                .number(1234567855555558L)
-                .balance(BigDecimal.valueOf(110))
-                .credit(BigDecimal.valueOf(110))
-                .debit(BigDecimal.ZERO)
-                .currency("USD")
-                .build();
         Transaction transaction = Transaction.builder()
                 .id(3L)
                 .accountId(2L)
@@ -76,7 +68,9 @@ class GenerateTransactionUseCaseTest {
 
         Mockito.when(findAccountUseCase.findByAccountNumber(1234567855555558L))
                 .thenReturn(Mono.just(account));
-        Mockito.when(validationsUseCase.validateOverdraft(account, BigDecimal.valueOf(10)))
+        Mockito.when(validationsUseCase.validateOverdraft(account, BigDecimal.valueOf(10), EnumTransactionType.DEPOSIT))
+                .thenReturn(Mono.just(account));
+        Mockito.when(validationsUseCase.validateNegativeAmount(account, BigDecimal.valueOf(10)))
                 .thenReturn(Mono.just(account));
         Mockito.when(findAccountRegisterUseCase.findByAccountId(2L))
                 .thenReturn(Mono.just(accountRegister));

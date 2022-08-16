@@ -26,7 +26,8 @@ public class GenerateTransactionUseCase {
     public Mono<Tuple2<Transaction, Account>> generateTransactionForAccount(
             Long accountNumber, BigDecimal amount, EnumTransactionType type) {
         return findAccountUseCase.findByAccountNumber(accountNumber)
-                .flatMap(account -> validationsUseCase.validateOverdraft(account, amount))
+                .flatMap(account -> validationsUseCase.validateOverdraft(account, amount, type))
+                .flatMap(account -> validationsUseCase.validateNegativeAmount(account, amount))
                 .flatMap(account -> Mono.zip(Mono.just(account),
                         findAccountRegisterUseCase.findByAccountId(account.getId())))
                 .flatMap(values -> {
