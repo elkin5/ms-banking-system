@@ -3,6 +3,7 @@ package co.elkin.veritran.usecase.account;
 import co.elkin.veritran.model.account.Account;
 import co.elkin.veritran.model.transaction.Transaction;
 import co.elkin.veritran.model.transactiontype.enums.EnumTransactionType;
+import co.elkin.veritran.usecase.transaction.GenerateTransactionUseCase;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;

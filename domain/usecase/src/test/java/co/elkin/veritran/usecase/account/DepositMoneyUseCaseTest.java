@@ -4,6 +4,7 @@ import co.elkin.veritran.model.account.Account;
 import co.elkin.veritran.model.transaction.Transaction;
 import co.elkin.veritran.model.transaction.exceptions.TransactionException;
 import co.elkin.veritran.model.transactiontype.enums.EnumTransactionType;
+import co.elkin.veritran.usecase.transaction.GenerateTransactionUseCase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
