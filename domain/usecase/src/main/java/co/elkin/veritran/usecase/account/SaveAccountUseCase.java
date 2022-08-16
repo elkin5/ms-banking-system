@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class FindAccountUseCase {
+public class SaveAccountUseCase {
     private final AccountRepository accountRepository;
 
-    public Mono<Account> findByAccountNumber(Long accountNumber) {
-        return accountRepository.findByNumber(accountNumber);
+    public Mono<Account> saveAccount(Account account) {
+        return accountRepository.save(account);
     }
 }

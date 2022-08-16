@@ -12,5 +12,5 @@ public class Client {
     private String email;
     private String lastName;
     private LocalDate birthDate;
-    private String identification;
+    private String documentNumber;
 }
