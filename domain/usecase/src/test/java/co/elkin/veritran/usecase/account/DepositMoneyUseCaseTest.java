@@ -2,7 +2,6 @@ package co.elkin.veritran.usecase.account;
 
 import co.elkin.veritran.model.account.Account;
 import co.elkin.veritran.model.transaction.Transaction;
-import co.elkin.veritran.model.transaction.exceptions.TransactionException;
 import co.elkin.veritran.model.transactiontype.enums.EnumTransactionType;
 import co.elkin.veritran.usecase.transaction.GenerateTransactionUseCase;
 import org.junit.jupiter.api.Assertions;
@@ -77,13 +76,5 @@ class DepositMoneyUseCaseTest {
                     return true;
                 })
                 .verifyComplete();
-    }
-
-    @Test
-    @DisplayName("when the amount is negative then Exception")
-    void testDepositMoney2() {
-        depositMoneyUseCase.deposit(1234567855555558L, BigDecimal.TEN)
-                .as(StepVerifier::create)
-                .verifyError(TransactionException.class);
     }
 }
