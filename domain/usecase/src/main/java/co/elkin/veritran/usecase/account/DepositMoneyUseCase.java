@@ -35,7 +35,7 @@ public class DepositMoneyUseCase {
         Account account = values.getT1();
         AccountRegister accountRegister = values.getT2();
         BigDecimal amount = values.getT3();
-        return findTransactionTypeUseCase.findByName("withdrawal")
+        return findTransactionTypeUseCase.findByName("deposit")
                 .map(TransactionType::getId)
                 .map(transactionTypeId -> Transaction.builder()
                         .transactionTypeId(transactionTypeId)
