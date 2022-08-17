@@ -15,13 +15,13 @@ public class DepositMoneyUseCase {
     private final GenerateTransactionUseCase generateTransactionUseCase;
     private final SaveAccountUseCase saveAccountUseCase;
 
-    public Mono<Account> deposit(Long accountNumber, BigDecimal amount) {
+    public Mono<Tuple2<Transaction, Account>> deposit(Long accountNumber, BigDecimal amount) {
         return generateTransactionUseCase.generateTransactionForAccount(accountNumber, amount,
                         EnumTransactionType.DEPOSIT)
                 .flatMap(this::updateAccountBalance);
     }
 
-    private Mono<Account> updateAccountBalance(Tuple2<Transaction, Account> values) {
+    private Mono<Tuple2<Transaction, Account>> updateAccountBalance(Tuple2<Transaction, Account> values) {
         Transaction transaction = values.getT1();
         Account account = values.getT2();
         BigDecimal credit = account.getCredit().add(transaction.getAmount());
@@ -30,6 +30,6 @@ public class DepositMoneyUseCase {
                 .credit(credit)
                 .balance(balance)
                 .build();
-        return saveAccountUseCase.saveAccount(accountUpdated);
+        return Mono.zip(Mono.just(transaction), saveAccountUseCase.saveAccount(accountUpdated));
     }
 }

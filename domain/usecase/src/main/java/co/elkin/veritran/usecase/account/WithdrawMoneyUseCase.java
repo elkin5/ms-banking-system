@@ -15,13 +15,13 @@ public class WithdrawMoneyUseCase {
     private final GenerateTransactionUseCase generateTransactionUseCase;
     private final SaveAccountUseCase saveAccountUseCase;
 
-    public Mono<Account> withdraw(Long accountNumber, BigDecimal amount) {
+    public Mono<Tuple2<Transaction, Account>> withdraw(Long accountNumber, BigDecimal amount) {
         return generateTransactionUseCase.generateTransactionForAccount(accountNumber, amount,
                         EnumTransactionType.WITHDRAWAL)
                 .flatMap(this::updateAccountBalance);
     }
 
-    private Mono<Account> updateAccountBalance(Tuple2<Transaction, Account> values) {
+    private Mono<Tuple2<Transaction, Account>> updateAccountBalance(Tuple2<Transaction, Account> values) {
         Transaction transaction = values.getT1();
         Account account = values.getT2();
         BigDecimal debit = account.getDebit().add(transaction.getAmount());
@@ -30,6 +30,6 @@ public class WithdrawMoneyUseCase {
                 .debit(debit)
                 .balance(balance)
                 .build();
-        return saveAccountUseCase.saveAccount(accountUpdated);
+        return Mono.zip(Mono.just(transaction), saveAccountUseCase.saveAccount(accountUpdated));
     }
 }

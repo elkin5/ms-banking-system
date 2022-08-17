@@ -71,8 +71,9 @@ class DepositMoneyUseCaseTest {
         depositMoneyUseCase.deposit(1234567855555558L, BigDecimal.TEN)
                 .as(StepVerifier::create)
                 .expectNextMatches(result -> {
-                    Assertions.assertEquals(1234567855555558L, result.getNumber());
-                    Assertions.assertEquals(BigDecimal.valueOf(110), result.getBalance());
+                    Account accountResult = result.getT2();
+                    Assertions.assertEquals(1234567855555558L, accountResult.getNumber());
+                    Assertions.assertEquals(BigDecimal.valueOf(110), accountResult.getBalance());
                     return true;
                 })
                 .verifyComplete();

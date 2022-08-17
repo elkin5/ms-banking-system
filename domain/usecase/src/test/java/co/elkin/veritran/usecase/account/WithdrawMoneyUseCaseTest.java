@@ -54,7 +54,7 @@ class WithdrawMoneyUseCaseTest {
                 .id(3L)
                 .accountId(2L)
                 .clientId(1L)
-                .transactionTypeId(1L)
+                .transactionTypeId(2L)
                 .amount(BigDecimal.TEN)
                 .build();
 
@@ -69,8 +69,9 @@ class WithdrawMoneyUseCaseTest {
         withdrawMoneyUseCase.withdraw(1234567855555558L, BigDecimal.TEN)
                 .as(StepVerifier::create)
                 .expectNextMatches(result -> {
-                    Assertions.assertEquals(1234567855555558L, result.getNumber());
-                    Assertions.assertEquals(BigDecimal.valueOf(90), result.getBalance());
+                    Account accountResult = result.getT2();
+                    Assertions.assertEquals(1234567855555558L, accountResult.getNumber());
+                    Assertions.assertEquals(BigDecimal.valueOf(90), accountResult.getBalance());
                     return true;
                 })
                 .verifyComplete();

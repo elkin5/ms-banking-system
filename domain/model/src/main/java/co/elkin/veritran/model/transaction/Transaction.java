@@ -15,4 +15,5 @@ public class Transaction {
     private Long clientId;
     private BigDecimal amount;
     private LocalDateTime creationDate;
+    private String chanel;
 }

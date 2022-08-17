@@ -12,15 +12,15 @@ import java.math.BigDecimal;
 public class ValidationsUseCase {
     public Mono<Account> validateOverdraft(Account account, BigDecimal amount, EnumTransactionType type) {
         if (type.equals(EnumTransactionType.WITHDRAWAL) && amount.compareTo(account.getBalance()) > 0) {
-            return Mono.error(new TransactionException("Invalid amount"));
+            return Mono.error(new TransactionException("Invalid amount: Balance must be greater than transaction amount"));
         } else {
             return Mono.just(account);
         }
     }
 
     public Mono<Account> validateNegativeAmount(Account account, BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) < 0) {
-            return Mono.error(new TransactionException("Negative amount"));
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            return Mono.error(new TransactionException("Negative or Zero amount"));
         } else {
             return Mono.just(account);
         }
