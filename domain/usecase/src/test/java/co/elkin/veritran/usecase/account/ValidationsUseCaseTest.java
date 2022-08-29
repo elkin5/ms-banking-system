@@ -58,12 +58,11 @@ class ValidationsUseCaseTest {
                 .build();
         BigDecimal amount = BigDecimal.valueOf(-10);
 
-
         validationsUseCase.validateNegativeAmount(account, amount)
                 .as(StepVerifier::create)
                 .expectErrorMatches(throwable -> {
                     Assertions.assertEquals(TransactionException.class, throwable.getClass());
-                    Assertions.assertTrue(throwable.getMessage().contains("Negative amount"));
+                    Assertions.assertTrue(throwable.getMessage().contains("Negative or Zero amount"));
                     return true;
                 })
                 .verify();
