@@ -1,14 +1,10 @@
 package co.elkin.veritran.usecase.transaction;
 
+import co.elkin.veritran.model.Amount;
+import co.elkin.veritran.model.TransactionType;
 import co.elkin.veritran.model.account.Account;
-import co.elkin.veritran.model.accountregister.AccountRegister;
 import co.elkin.veritran.model.transaction.Transaction;
-import co.elkin.veritran.model.transactiontype.TransactionType;
-import co.elkin.veritran.model.transactiontype.enums.EnumTransactionType;
 import co.elkin.veritran.usecase.account.FindAccountUseCase;
-import co.elkin.veritran.usecase.account.ValidationsUseCase;
-import co.elkin.veritran.usecase.accountregister.FindAccountRegisterUseCase;
-import co.elkin.veritran.usecase.transactiontype.FindTransactionTypeUseCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -17,7 +13,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import reactor.util.function.Tuples;
 
 import java.math.BigDecimal;
 
@@ -25,13 +20,7 @@ class GenerateTransactionUseCaseTest {
     @Mock
     private FindAccountUseCase findAccountUseCase;
     @Mock
-    private FindAccountRegisterUseCase findAccountRegisterUseCase;
-    @Mock
-    private FindTransactionTypeUseCase findTransactionTypeUseCase;
-    @Mock
     private SaveTransactionUseCase saveTransactionUseCase;
-    @Mock
-    private ValidationsUseCase validationsUseCase;
 
     @InjectMocks
     private GenerateTransactionUseCase generateTransactionUseCase;
@@ -43,46 +32,27 @@ class GenerateTransactionUseCaseTest {
 
     @Test
     void generateTransactionForAccount() {
+        Long accountNumber = 1234567855555558L;
+
         Account account = Account.builder()
-                .id(2L)
-                .number(1234567855555558L)
-                .balance(BigDecimal.valueOf(100))
-                .credit(BigDecimal.valueOf(100))
-                .debit(BigDecimal.ZERO)
+                .number(accountNumber)
+                .credit(new Amount(BigDecimal.valueOf(100)))
+                .debit(new Amount(BigDecimal.valueOf(0)))
                 .currency("USD")
                 .build();
-        Transaction transaction = Transaction.builder()
-                .id(3L)
-                .accountId(2L)
-                .clientId(1L)
-                .transactionTypeId(1L)
-                .amount(BigDecimal.TEN)
-                .build();
 
-        AccountRegister accountRegister = AccountRegister.builder()
-                .id(1L)
-                .accountId(2L)
-                .clientId(1L)
-                .status("ACTIVE")
-                .build();
+        Amount amount = new Amount(BigDecimal.TEN);
 
-        Mockito.when(findAccountUseCase.findByAccountNumber(1234567855555558L))
+        Transaction transaction = new Transaction(TransactionType.DEPOSIT, account, amount, "");
+
+        Mockito.when(findAccountUseCase.findByAccountNumber(accountNumber))
                 .thenReturn(Mono.just(account));
-        Mockito.when(validationsUseCase.validateOverdraft(account, BigDecimal.valueOf(10), EnumTransactionType.DEPOSIT))
-                .thenReturn(Mono.just(account));
-        Mockito.when(validationsUseCase.validateNegativeAmount(account, BigDecimal.valueOf(10)))
-                .thenReturn(Mono.just(account));
-        Mockito.when(findAccountRegisterUseCase.findByAccountId(2L))
-                .thenReturn(Mono.just(accountRegister));
-        Mockito.when(findTransactionTypeUseCase.findByName(EnumTransactionType.DEPOSIT))
-                .thenReturn(Mono.just(TransactionType.builder().id(1L).name("deposit").build()));
-        Mockito.when(saveTransactionUseCase.save(transaction.toBuilder().id(null).build()))
+        Mockito.when(saveTransactionUseCase.save(Mockito.any()))
                 .thenReturn(Mono.just(transaction));
 
-        generateTransactionUseCase.generateTransactionForAccount(1234567855555558L, BigDecimal.valueOf(10),
-                        EnumTransactionType.DEPOSIT)
+        generateTransactionUseCase.generateTransactionForAccount(accountNumber, amount, TransactionType.DEPOSIT)
                 .as(StepVerifier::create)
-                .expectNext(Tuples.of(transaction, account))
+                .expectNext(transaction)
                 .verifyComplete();
     }
 }

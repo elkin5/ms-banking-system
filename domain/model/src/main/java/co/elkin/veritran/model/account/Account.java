@@ -1,16 +1,21 @@
 package co.elkin.veritran.model.account;
+
+import co.elkin.veritran.model.Amount;
+import co.elkin.veritran.model.client.Client;
 import lombok.Builder;
 import lombok.Data;
-
-import java.math.BigDecimal;
 
 @Data
 @Builder(toBuilder = true)
 public class Account {
-    private Long id;
     private Long number;
-    private BigDecimal balance;
-    private BigDecimal debit;
-    private BigDecimal credit;
+    private Amount debit;
+    private Amount credit;
     private String currency;
+    private String status;
+    private Client client;
+
+    public Amount getBalance() {
+        return new Amount(this.credit.getValue().subtract(this.debit.getValue()));
+    }
 }
